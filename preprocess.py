@@ -1,7 +1,7 @@
 import torch
 import torchvision.transforms as transforms
 from torchvision import datasets
-from torch.utils.data import random_split
+from torch.utils.data import random_split, DataLoader
 
 # 1. Data transformation pipeline setup
 train_transforms = transforms.Compose([
@@ -34,17 +34,26 @@ test_dataset = datasets.ImageFolder(root=test_dir, transform=test_transforms)
 train_size = int(0.9 * len(full_train_dataset))
 val_size = len(full_train_dataset) - train_size
 
-# Set generator seed for reproducible split
 train_dataset, val_dataset = random_split(
     full_train_dataset, 
     [train_size, val_size],
     generator=torch.Generator().manual_seed(42)
 )
 
+# 4. DataLoaders Creation (batch_size = 32)
+BATCH_SIZE = 32
+
+train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=2)
+val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=2)
+test_loader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=2)
+
 if __name__ == "__main__":
-    print("Train/Validation split completed successfully!")
-    print(f"Classes mapping: {full_train_dataset.class_to_idx}")
-    print(f"Total original train samples: {len(full_train_dataset)}")
-    print(f"Actual Training samples (90%): {len(train_dataset)}")
-    print(f"Validation samples (10%): {len(val_dataset)}")
-    print(f"Testing samples: {len(test_dataset)}")
+    print("DataLoaders created successfully!")
+    print(f"Train Batches: {len(train_loader)}")
+    print(f"Validation Batches: {len(val_loader)}")
+    print(f"Test Batches: {len(test_loader)}")
+    
+    # Verify one batch structure
+    images, labels = next(iter(train_loader))
+    print(f"Sample Batch Image Shape: {images.shape}")
+    print(f"Sample Batch Label Shape: {labels.shape}")
