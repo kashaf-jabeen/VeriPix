@@ -41,3 +41,16 @@ try:
     st.sidebar.success("Model loaded successfully!")
 except Exception as e:
     st.error(f"Error loading model: {e}")
+
+    # Multi-Image File Uploader
+st.write("---")
+uploaded_files = st.file_uploader(
+    "Upload Image(s)...", 
+    type=["jpg", "jpeg", "png"], 
+    accept_multiple_files=True
+)
+
+if uploaded_files:
+    if len(uploaded_files) > 5:
+        st.warning("Maximum 5 images allowed at a time. Processing only the first 5 images.")
+        uploaded_files = uploaded_files[:5]
