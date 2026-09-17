@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid bg-dark text-white py-5 min-vh-100" style="background-color: #0b0e14 !important;">
+    <div class="container">
+        
+        <!-- Header -->
+        <div class="mb-4">
+            <h2 class="fw-bold">Account & Preferences</h2>
+            <p class="text-muted small">Manage profile details, forensic model sensitivities, and API keys.</p>
+        </div>
+
+        <div class="row g-4">
+            <!-- Left Column -->
+            <div class="col-lg-6">
+                
+                <!-- Profile Information Card -->
+                <div class="card bg-secondary bg-opacity-10 border-secondary text-white mb-4 rounded-3 p-3">
+                    <div class="card-body">
+                        <h5 class="card-title fw-semibold mb-3">
+                            <i class="bi bi-person-fill text-primary me-2"></i>Profile Information
+                        </h5>
+                        
+                        <form method="POST" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <!-- Avatar Upload Section -->
+                            <div class="d-flex align-items-center bg-dark bg-opacity-50 p-3 rounded mb-3">
+                                <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold me-3" style="width: 55px; height: 55px; font-size: 1.2rem;">
+                                    MO
+                                </div>
+                                <div>
+                                    <h6 class="mb-0 fw-bold">Momin</h6>
+                                    <small class="text-muted d-block mb-2">JPG, PNG max 2MB</small>
+                                    <label for="avatarUpload" class="btn btn-primary btn-sm rounded-pill">
+                                        <i class="bi bi-upload me-1"></i> Upload Pic
+                                    </label>
+                                    <input type="file" id="avatarUpload" name="avatar" class="d-none">
+                                </div>
+                            </div>
+
+                            <!-- Username -->
+                            <div class="mb-3">
+                                <label class="form-label small text-muted">Username</label>
+                                <input type="text" name="username" class="form-control bg-dark text-white border-secondary" value="Momin">
+                            </div>
+
+                            <!-- Email Address -->
+                            <div class="mb-3">
+                                <label class="form-label small text-muted">Email Address</label>
+                                <input type="email" name="email" class="form-control bg-dark text-white border-secondary" value="momin@gmail.com">
+                            </div>
+
+                            <button type="submit" name="update_profile" class="btn btn-primary w-100 mt-2">
+                                <i class="bi bi-save me-1"></i> Save Profile Changes
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Change Password Card -->
+                <div class="card bg-secondary bg-opacity-10 border-secondary text-white rounded-3 p-3">
+                    <div class="card-body">
+                        <h5 class="card-title fw-semibold mb-3">
+                            <i class="bi bi-key-fill text-primary me-2"></i>Change Password
+                        </h5>
+                        
+                        <form method="POST">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label class="form-label small text-muted">Current Password</label>
+                                <input type="password" name="current_password" class="form-control bg-dark text-white border-secondary" placeholder="••••••••">
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label small text-muted">New Password</label>
+                                <input type="password" name="new_password" class="form-control bg-dark text-white border-secondary" placeholder="••••••••">
+                            </div>
+
+                            <button type="submit" name="change_password" class="btn btn-outline-primary w-100 mt-2">
+                                <i class="bi bi-shield-lock me-1"></i> Update Password
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Right Column -->
+            <div class="col-lg-6">
+                
+                <!-- Detection & Model Preferences Card -->
+                <div class="card bg-secondary bg-opacity-10 border-secondary text-white mb-4 rounded-3 p-3">
+                    <div class="card-body">
+                        <h5 class="card-title fw-semibold mb-3">
+                            <i class="bi bi-sliders text-primary me-2"></i>Detection & Model Preferences
+                        </h5>
+
+                        <form method="POST">
+                            {% csrf_token %}
+                            <!-- Model Select Dropdown -->
+                            <div class="mb-4">
+                                <label class="form-label small text-muted">Default Detection Engine</label>
+                                <select class="form-select bg-dark text-white border-secondary" name="detection_engine">
+                                    <option selected>ResNet-18 (CIFAKE Trained - Fast & Precise)</option>
+                                    <option value="resnet50">ResNet-50 (Deep Scan)</option>
+                                </select>
+                            </div>
+
+                            <!-- Sensitivity Range Slider -->
+                            <div class="mb-4">
+                                <div class="d-flex justify-content-between">
+                                    <label class="form-label small text-muted">AI Flagging Sensitivity Threshold</label>
+                                    <span class="small text-primary fw-bold" id="sensitivityVal">85%</span>
+                                </div>
+                                <input type="range" class="form-range" min="0" max="100" value="85" id="sensitivityRange" name="sensitivity" oninput="document.getElementById('sensitivityVal').innerText = this.value + '%'">
+                            </div>
+
+                            <!-- Grad-CAM Toggle Switch -->
+                            <div class="form-check form-switch mb-2">
+                                <input class="form-check-input" type="checkbox" role="switch" id="gradCamSwitch" name="auto_gradcam" checked>
+                                <label class="form-check-label small text-light" for="gradCamSwitch">
+                                    Auto-render Grad-CAM Heatmaps on image upload
+                                </label>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Danger Zone Card -->
+                <div class="card bg-danger bg-opacity-10 border-danger text-white rounded-3 p-3">
+                    <div class="card-body">
+                        <h5 class="card-title fw-semibold text-danger mb-3">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>Danger Zone
+                        </h5>
+                        <p class="small text-muted mb-3">Permanent actions regarding your scan history data.</p>
+
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-outline-danger btn-sm text-start" data-bs-toggle="modal" data-bs-target="#clearHistoryModal">
+                                <i class="bi bi-trash me-2"></i> Clear All Scan History
+                            </button>
+                            <button class="btn btn-danger btn-sm text-start">
+                                <i class="bi bi-person-x me-2"></i> Delete Profile Permanently
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -20,8 +20,9 @@ def train_model(epochs=5, lr=0.0001, save_path="veripix_model.pth"):
 
     model = build_model().to(device)
 
-    # 4. Loss function and Optimizer
-    criterion = nn.CrossEntropyLoss()
+    # 4. Loss function (Label Smoothing Added) & Optimizer
+    # label_smoothing=0.1 model ko 100% overconfident hone se rokeyga
+    criterion = nn.CrossEntropyLoss(label_smoothing=0.1)
     optimizer = optim.Adam(model.parameters(), lr=lr)
 
     # 5. Training Loop
@@ -77,5 +78,5 @@ def train_model(epochs=5, lr=0.0001, save_path="veripix_model.pth"):
     print(f"Model successfully saved to {save_path}")
 
 if __name__ == '__main__':
-    # Local dry-run verification
-    print("Model structure initialized successfully!")
+    # Training process start karne ke liye
+    train_model(epochs=5)

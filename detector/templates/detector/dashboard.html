@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VeriPix - Forensic Analytics Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            background-color: #030712;
+            color: #f3f4f6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Modern Navbar Styling */
+        .site-header {
+            width: 100%;
+            background-color: #090d16;
+            border-bottom: 1px solid #1f2937;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 0.8rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .brand-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            text-decoration: none;
+            color: #ffffff;
+            font-weight: 800;
+            font-size: 1.3rem;
+        }
+
+        .brand-logo i { color: #3b82f6; font-size: 1.5rem; }
+        .brand-name span { color: #3b82f6; }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            list-style: none;
+            margin: 0;
+            background: #111827;
+            padding: 4px;
+            border-radius: 8px;
+            border: 1px solid #1f2937;
+        }
+
+        .nav-link-item {
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #9ca3af;
+            padding: 0.4rem 0.9rem;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .nav-link-item:hover, .nav-link-item.active {
+            color: #ffffff;
+            background-color: #1f2937;
+        }
+
+        /* Dashboard Main Layout */
+        .dashboard-wrapper {
+            padding: 3rem 1.5rem;
+            max-width: 1300px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .stat-card {
+            background-color: #0d1322;
+            border: 1px solid #1f2937;
+            border-radius: 14px;
+            padding: 1.6rem;
+            transition: transform 0.2s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            border-color: #2563eb;
+        }
+
+        .stat-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+        }
+
+        .dash-table-card {
+            background-color: #0d1322;
+            border: 1px solid #1f2937;
+            border-radius: 14px;
+            overflow: hidden;
+        }
+
+        .table-dark-custom {
+            --bs-table-bg: #0d1322;
+            --bs-table-border-color: #1f2937;
+            color: #e2e8f0;
+            margin-bottom: 0;
+        }
+
+        .table-dark-custom th {
+            color: #cbd5e1 !important;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid #374151 !important;
+        }
+
+        .table-dark-custom td {
+            color: #f8fafc !important;
+        }
+
+        .table-dark-custom .type-cell {
+            color: #38bdf8 !important;
+            font-weight: 600;
+        }
+
+        /* Dark Custom Modal Styling */
+        .modal-content-custom {
+            background-color: #0d1322;
+            border: 1px solid #374151;
+            border-radius: 14px;
+            color: #f3f4f6;
+        }
+
+        /* Footer Styling */
+        .site-footer {
+            background-color: #060a12;
+            border-top: 1px solid #1f2937;
+            padding: 2.5rem 1.5rem 1.5rem 1.5rem;
+            margin-top: auto;
+        }
+
+        .footer-container {
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+
+        .footer-link {
+            color: #9ca3af;
+            text-decoration: none;
+            transition: color 0.2s ease;
+            font-size: 0.88rem;
+        }
+
+        .footer-link:hover {
+            color: #3b82f6;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="site-header">
+        <div class="nav-container">
+            <a href="/" class="brand-logo">
+                <i class="fa-solid fa-shield-halved"></i>
+                <span class="brand-name">Veri<span>Pix</span></span>
+            </a>
+
+            <!-- Updated Direct Routes in Navbar Links -->
+            <ul class="nav-links d-none d-md-flex">
+                <li><a href="/dashboard/" class="nav-link-item active">Dashboard</a></li>
+                <li><a href="/detect/" class="nav-link-item">Image</a></li>
+                <li><a href="/detect/#text-section" class="nav-link-item">Text</a></li>
+                <li><a href="/detect/#history-section" class="nav-link-item">History</a></li>
+                <li><a href="/detect/#settings-section" class="nav-link-item">Settings</a></li>
+            </ul>
+
+            <div class="d-flex align-items-center gap-3">
+                <a href="/" class="btn btn-outline-secondary text-light btn-sm fw-semibold">
+                    <i class="fa-solid fa-house me-1"></i> Home
+                </a>
+                {% if request.user.is_authenticated %}
+                    <a href="/logout/" class="btn btn-danger btn-sm fw-semibold">Logout</a>
+                {% else %}
+                    <a href="/login/" class="btn btn-primary btn-sm fw-semibold">Sign In</a>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+
+    <div class="dashboard-wrapper">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+            <div>
+                <h3 class="fw-bold text-light mb-1">Live Forensic Analytics Dashboard</h3>
+                <p class="text-secondary small mb-0">Real-time dynamic overview of your media analysis logs</p>
+            </div>
+            <a href="/detect/" class="btn btn-primary fw-semibold px-3 py-2 align-self-start">
+                <i class="fa-solid fa-plus me-1"></i> Scan New File
+            </a>
+        </div>
+
+        <!-- Metric Stat Cards -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-3 col-6">
+                <div class="stat-card shadow-sm">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <span class="text-secondary small fw-semibold">TOTAL ANALYZED</span>
+                        <div class="stat-icon bg-primary bg-opacity-10 text-primary">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </div>
+                    </div>
+                    <h2 class="fw-bold text-light mb-0">{{ total_scans|default:0 }}</h2>
+                    <span class="text-success small fw-semibold"><i class="fa-solid fa-rotate me-1"></i>Live Tracked</span>
+                </div>
+            </div>
+
+            <div class="col-md-3 col-6">
+                <div class="stat-card shadow-sm">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <span class="text-secondary small fw-semibold">REAL MEDIA</span>
+                        <div class="stat-icon bg-success bg-opacity-10 text-success">
+                            <i class="fa-solid fa-circle-check"></i>
+                        </div>
+                    </div>
+                    <h2 class="fw-bold text-light mb-0">{{ real_count|default:0 }}</h2>
+                    <span class="text-secondary small">{{ real_percentage|default:0 }}% Authentic</span>
+                </div>
+            </div>
+
+            <div class="col-md-3 col-6">
+                <div class="stat-card shadow-sm">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <span class="text-secondary small fw-semibold">AI DEEPFAKES</span>
+                        <div class="stat-icon bg-danger bg-opacity-10 text-danger">
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                        </div>
+                    </div>
+                    <h2 class="fw-bold text-light mb-0">{{ ai_count|default:0 }}</h2>
+                    <span class="text-danger small fw-semibold">{{ ai_percentage|default:0 }}% Synthesized</span>
+                </div>
+            </div>
+
+            <div class="col-md-3 col-6">
+                <div class="stat-card shadow-sm">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <span class="text-secondary small fw-semibold">DETECTOR ENGINE</span>
+                        <div class="stat-icon bg-info bg-opacity-10 text-info">
+                            <i class="fa-solid fa-microchip"></i>
+                        </div>
+                    </div>
+                    <h2 class="fw-bold text-light mb-0">{{ model_name|default:"ResNet-18" }}</h2>
+                    <span class="text-success small fw-semibold"><i class="fa-solid fa-circle text-success me-1" style="font-size: 8px;"></i>Online & Active</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Visual Analytics Charts Section -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-5">
+                <div class="dash-table-card p-3 h-100">
+                    <h6 class="fw-bold text-light mb-3"><i class="fa-solid fa-chart-pie me-2 text-primary"></i>Detection Ratio</h6>
+                    <div style="max-height: 220px;" class="d-flex justify-content-center">
+                        <canvas id="detectionPieChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-7">
+                <div class="dash-table-card p-3 h-100">
+                    <h6 class="fw-bold text-light mb-3"><i class="fa-solid fa-chart-line me-2 text-info"></i>Scan Activity Trend</h6>
+                    <div style="max-height: 220px;">
+                        <canvas id="scanTrendChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Activity Logs Table -->
+        <div class="dash-table-card p-4 shadow-lg mb-5">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold text-light mb-0">Live Forensic Activity Logs</h5>
+                <span class="badge bg-secondary bg-opacity-20 text-light border border-secondary px-3 py-2">Auto-Updated</span>
+            </div>
+            
+            <div class="table-responsive">
+                <table class="table table-dark-custom table-hover align-middle">
+                    <thead>
+                        <tr class="small">
+                            <th class="py-3">TYPE</th>
+                            <th class="py-3">FILE NAME</th>
+                            <th class="py-3">VERDICT</th>
+                            <th class="py-3">CONFIDENCE SCORE</th>
+                            <th class="py-3">TIMESTAMP</th>
+                            <th class="py-3 text-end">ACTION</th>
+                        </tr>
+                    </thead>
+                    <tbody class="small">
+                        {% if recent_logs %}
+                            {% for log in recent_logs %}
+                            <tr>
+                                <td class="type-cell">
+                                    {% if log.file_type == 'image' %}
+                                        <i class="fa-solid fa-image text-info me-2"></i>Image
+                                    {% elif log.file_type == 'audio' %}
+                                        <i class="fa-solid fa-microphone text-info me-2"></i>Audio
+                                    {% else %}
+                                        <i class="fa-solid fa-file-lines text-warning me-2"></i>Text
+                                    {% endif %}
+                                </td>
+                                <td class="fw-semibold text-light">{{ log.file_name|default:"scan_media.png" }}</td>
+                                <td>
+                                    {% if log.verdict == 'Real' or log.verdict == 'Authentic' %}
+                                        <span class="badge bg-success bg-opacity-20 text-success border border-success px-2 py-1">Real / Authentic</span>
+                                    {% else %}
+                                        <span class="badge bg-danger bg-opacity-20 text-danger border border-danger px-2 py-1">AI Generated</span>
+                                    {% endif %}
+                                </td>
+                                <td class="fw-bold text-light">{{ log.confidence_score|default:"0" }}%</td>
+                                <td class="text-secondary">{{ log.created_at|timesince }} ago</td>
+                                <td class="text-end">
+                                    <div class="d-inline-flex gap-2">
+                                        <a href="/heatmap/{{ log.id }}/" class="btn btn-sm btn-outline-primary">
+                                            <i class="fa-solid fa-fire"></i> Heatmap
+                                        </a>
+
+                                        <!-- Custom Modal Trigger Button -->
+                                        <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ log.id }}">
+                                            <i class="fa-solid fa-trash"></i> Delete
+                                        </button>
+                                    </div>
+
+                                    <!-- Dark Themed Delete Confirmation Popup Modal -->
+                                    <div class="modal fade" id="deleteModal{{ log.id }}" tabindex="-1" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered">
+                                            <div class="modal-content modal-content-custom">
+                                                <div class="modal-header border-secondary border-opacity-25 py-2">
+                                                    <h6 class="modal-title fw-bold text-danger">
+                                                        <i class="fa-solid fa-triangle-exclamation me-2"></i>Confirm Deletion
+                                                    </h6>
+                                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body text-start py-3">
+                                                    <p class="mb-1 text-light">Are you sure you want to delete this scan record?</p>
+                                                    <span class="text-secondary small">File: <strong>{{ log.file_name }}</strong></span>
+                                                </div>
+                                                <div class="modal-footer border-secondary border-opacity-25 py-2">
+                                                    <button type="button" class="btn btn-sm btn-secondary fw-semibold" data-bs-dismiss="modal">Cancel</button>
+                                                    <form action="{% url 'delete_log' log.id %}" method="POST" class="d-inline">
+                                                        {% csrf_token %}
+                                                        <button type="submit" class="btn btn-sm btn-danger fw-semibold">
+                                                            <i class="fa-solid fa-trash me-1"></i> Yes, Delete
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="6" class="text-center text-secondary py-4">
+                                    No scans recorded yet. Upload a file to see live analytics!
+                                </td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="row g-4 mb-4">
+                <div class="col-lg-4 col-md-6">
+                    <a href="/" class="brand-logo mb-3 d-inline-flex">
+                        <i class="fa-solid fa-shield-halved"></i>
+                        <span class="brand-name">Veri<span>Pix</span></span>
+                    </a>
+                    <p class="text-secondary small leading-relaxed">
+                        VeriPix enterprise dashboard gives real-time tracking, analytical metrics, and historical logs of all deep learning AI forensic scans.
+                    </p>
+                </div>
+                <div class="col-lg-2 col-md-6 col-6">
+                    <h6 class="text-light fw-bold mb-3 small">NAVIGATION</h6>
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-2"><a href="/" class="footer-link">Home Page</a></li>
+                        <li class="mb-2"><a href="/dashboard/" class="footer-link">Live Dashboard</a></li>
+                        <li class="mb-2"><a href="/detect/" class="footer-link">Image Forensics</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-2 col-md-6 col-6">
+                    <h6 class="text-light fw-bold mb-3 small">SERVICES</h6>
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-2"><a href="/detect/#audio-section" class="footer-link">Voice Analysis</a></li>
+                        <li class="mb-2"><a href="/detect/#text-section" class="footer-link">Text Synthesizer</a></li>
+                        <li class="mb-2"><a href="#" class="footer-link">API Key Setup</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <h6 class="text-light fw-bold mb-3 small">SYSTEM HEALTH</h6>
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <span class="spinner-grow spinner-grow-sm text-success" role="status"></span>
+                        <span class="text-light small fw-semibold">Live Database Connected</span>
+                    </div>
+                    <p class="text-secondary small">Real-time counts update automatically per scan.</p>
+                </div>
+            </div>
+
+            <div class="border-top border-secondary border-opacity-25 pt-3 d-flex flex-column flex-sm-row justify-content-between align-items-center gap-2">
+                <span class="text-secondary small">&copy; 2026 VeriPix AI Forensics. All rights reserved.</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Chart.js Render Scripts -->
+    <script>
+        const realCount = {{ real_count|default:0 }};
+        const aiCount = {{ ai_count|default:0 }};
+
+        // Donut Chart: Detection Ratio
+        const ctxPie = document.getElementById('detectionPieChart').getContext('2d');
+        new Chart(ctxPie, {
+            type: 'doughnut',
+            data: {
+                labels: ['Real / Authentic', 'AI Deepfake'],
+                datasets: [{
+                    data: [realCount, aiCount],
+                    backgroundColor: ['#10b981', '#ef4444'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { labels: { color: '#f3f4f6', font: { family: 'Plus Jakarta Sans' } } }
+                }
+            }
+        });
+
+        // Line Chart: Scan Activity Trend
+        const ctxTrend = document.getElementById('scanTrendChart').getContext('2d');
+        new Chart(ctxTrend, {
+            type: 'line',
+            data: {
+                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                datasets: [{
+                    label: 'Scans Handled',
+                    data: [1, 3, 2, 5, 4, 8, {{ total_scans|default:0 }}],
+                    borderColor: '#3b82f6',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: { ticks: { color: '#9ca3af' }, grid: { display: false } },
+                    y: { ticks: { color: '#9ca3af' }, grid: { color: '#1f2937' } }
+                },
+                plugins: { legend: { display: false } }
+            }
+        });
+    </script>
+</body>
+</html>

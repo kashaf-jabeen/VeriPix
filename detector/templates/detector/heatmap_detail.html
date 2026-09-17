@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VeriPix - Heatmap Analysis</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background-color: #030712; color: #f3f4f6; padding: 2rem 1rem; min-height: 100vh; }
+        .card-custom { background-color: #0d1322; border: 1px solid #1f2937; border-radius: 16px; padding: 2rem; max-width: 1000px; margin: 0 auto; }
+        .img-card { background: #070c18; border: 1px solid #1f2937; border-radius: 12px; padding: 10px; text-align: center; }
+        .img-preview { width: 100%; height: 260px; object-fit: contain; border-radius: 8px; background: #030712; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="max-width-1000 margin-auto mb-3" style="max-width: 1000px; margin: 0 auto 1rem auto;">
+            <a href="/dashboard/" class="btn btn-outline-secondary btn-sm fw-semibold">
+                <i class="fa-solid fa-arrow-left me-1"></i> Back to Dashboard
+            </a>
+        </div>
+
+        <div class="card-custom shadow-lg">
+            <h4 class="fw-bold mb-4 text-light"><i class="fa-solid fa-fire text-danger me-2"></i>Heatmap & Forensic Analysis</h4>
+            
+            <div class="row g-4">
+                <!-- Original Image -->
+                <div class="col-md-4">
+                    <div class="img-card">
+                        <span class="text-secondary small fw-semibold d-block mb-2">Original Image</span>
+                        <img src="{{ image_url }}" class="img-preview" alt="Original Image" onerror="this.onerror=null; this.src='https://via.placeholder.com/300x200?text=Image+Not+Found';">
+                    </div>
+                </div>
+
+                <!-- Grad-CAM Heatmap Image -->
+                <div class="col-md-4">
+                    <div class="img-card">
+                        <span class="text-info small fw-semibold d-block mb-2">Grad-CAM Heatmap</span>
+                        <img src="{{ gradcam_url }}" class="img-preview" alt="Heatmap Output" onerror="this.onerror=null; this.src='{{ image_url }}';">
+                    </div>
+                </div>
+
+                <!-- Forensic Analysis Metrics -->
+                <div class="col-md-4 d-flex flex-column justify-content-center ps-md-4">
+                    <div class="mb-3">
+                        <label class="text-secondary small d-block">File Name:</label>
+                        <h5 class="fw-semibold text-light mb-0">{{ log.file_name }}</h5>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="text-secondary small d-block">Verdict Result:</label>
+                        <div>
+                           {% if log.verdict == 'Real' or log.verdict == 'Authentic' %}
+                            <span class="badge bg-success bg-opacity-20 text-success border border-success px-3 py-2 fs-6">Real / Authentic</span>
+                           {% else %}
+                            <span class="badge bg-danger bg-opacity-20 text-danger border border-danger px-3 py-2 fs-6">AI Generated</span>
+                           {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="text-secondary small d-block">Confidence Score:</label>
+                        <h2 class="fw-bold text-info mb-0">{{ log.confidence_score }}%</h2>
+                    </div>
+
+                    <div>
+                        <label class="text-secondary small d-block">Scanned On:</label>
+                        <p class="text-secondary small mb-0">{{ log.created_at|default:"Recently Scanned" }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

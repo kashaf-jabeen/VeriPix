@@ -3,10 +3,12 @@ import torchvision.transforms as transforms
 from torchvision import datasets
 from torch.utils.data import random_split, DataLoader
 
-# 1. Data transformation pipeline setup
+# 1. Data transformation pipeline setup (Data Augmentation Added)
 train_transforms = transforms.Compose([
     transforms.Resize((224, 224)),
-    transforms.RandomHorizontalFlip(),
+    transforms.RandomHorizontalFlip(p=0.5),
+    transforms.RandomRotation(degrees=15),
+    transforms.ColorJitter(brightness=0.2, contrast=0.2),
     transforms.ToTensor(),
     transforms.Normalize(
         mean=[0.485, 0.456, 0.406],
@@ -40,15 +42,15 @@ train_dataset, val_dataset = random_split(
     generator=torch.Generator().manual_seed(42)
 )
 
-# 4. DataLoaders Creation (batch_size = 32)
+# 4. DataLoaders Creation (num_workers=0 to fix Windows deadlock)
 BATCH_SIZE = 32
 
-train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=2)
-val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=2)
-test_loader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=2)
+train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=0)
+val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=0)
+test_loader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=0)
 
 if __name__ == "__main__":
-    print("DataLoaders created successfully!")
+    print("DataLoaders created successfully with Data Augmentation!")
     print(f"Train Batches: {len(train_loader)}")
     print(f"Validation Batches: {len(val_loader)}")
     print(f"Test Batches: {len(test_loader)}")

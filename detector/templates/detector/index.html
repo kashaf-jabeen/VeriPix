@@ -1,0 +1,1147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VeriPix - AI Media Authenticity & Forensic Detector</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Plus Jakarta Sans Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: #030712;
+            color: #f3f4f6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Modern Navigation Header */
+        .site-header {
+            width: 100%;
+            background-color: #090d16;
+            border-bottom: 1px solid #1f2937;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 0.8rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .brand-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            text-decoration: none;
+            color: #ffffff;
+            font-weight: 800;
+            font-size: 1.3rem;
+            transition: opacity 0.2s ease;
+        }
+
+        .brand-logo:hover {
+            color: #ffffff;
+            opacity: 0.9;
+        }
+
+        .brand-logo i { color: #3b82f6; font-size: 1.5rem; }
+        .brand-name span { color: #3b82f6; }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            list-style: none;
+            margin: 0;
+            background: #111827;
+            padding: 4px;
+            border-radius: 8px;
+            border: 1px solid #1f2937;
+        }
+
+        .nav-link-item {
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #9ca3af;
+            padding: 0.4rem 0.9rem;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            display: inline-block;
+        }
+
+        .nav-link-item:hover, .nav-link-item.active {
+            color: #ffffff;
+            background-color: #1f2937;
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .btn-signin {
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #f3f4f6;
+            padding: 0.4rem 0.9rem;
+            transition: color 0.2s ease;
+        }
+
+        .btn-signin:hover {
+            color: #3b82f6;
+        }
+
+        .btn-signup {
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #ffffff;
+            background-color: #2563eb;
+            padding: 0.45rem 1rem;
+            border-radius: 6px;
+            transition: background-color 0.2s ease;
+        }
+
+        .btn-signup:hover {
+            background-color: #1d4ed8;
+            color: #ffffff;
+        }
+
+        .tab-content-section {
+            display: none;
+            width: 100%;
+        }
+
+        .tab-content-section.active {
+            display: block;
+        }
+
+        /* Hero Section */
+        .hero-landing-container {
+            padding: 5rem 1rem 3rem 1rem;
+            text-align: center;
+        }
+
+        .badge-pill {
+            display: inline-block;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            color: #9ca3af;
+            text-transform: uppercase;
+            background: #111827;
+            padding: 0.35rem 0.9rem;
+            border-radius: 20px;
+            border: 1px solid #1f2937;
+        }
+
+        .hero-title {
+            font-size: 3rem;
+            font-weight: 800;
+            line-height: 1.15;
+            color: #ffffff;
+        }
+
+        .hero-subtitle {
+            max-width: 680px;
+            font-size: 1.05rem;
+            color: #9ca3af;
+            line-height: 1.6;
+        }
+
+        /* Feature Cards & Learn More Section */
+        .learn-more-container {
+            padding: 4rem 1rem;
+            background-color: #060b17;
+            border-top: 1px solid #1f2937;
+        }
+
+        .feature-block {
+            background-color: #0d1322;
+            border: 1px solid #1f2937;
+            border-radius: 16px;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+
+        .feature-block:hover {
+            border-color: #2563eb;
+            transform: translateY(-3px);
+        }
+
+        .feature-img-box {
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #1f2937;
+            background: #111827;
+            min-height: 260px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .feature-img {
+            width: 100%;
+            height: 260px;
+            object-fit: cover;
+            border-radius: 12px;
+            display: block;
+            transition: opacity 0.3s ease;
+        }
+
+        .feature-icon-badge {
+            width: 48px;
+            height: 48px;
+            background: #111827;
+            border: 1px solid #1f2937;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            color: #3b82f6;
+            margin-bottom: 1rem;
+        }
+
+        /* Upload Card Styling */
+        .upload-card-wrapper {
+            padding: 4rem 1rem;
+        }
+
+        .upload-card {
+            background-color: #0d1322;
+            border: 2px dashed #1f2937;
+            border-radius: 16px;
+            padding: 4rem 2rem;
+            cursor: pointer;
+            max-width: 680px;
+            margin: 0 auto;
+            transition: all 0.3s ease;
+        }
+
+        .upload-card:hover, .upload-card.dragover {
+            border-color: #3b82f6;
+            background-color: #111827;
+        }
+
+        .loader-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(3, 7, 18, 0.92);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            flex-direction: column;
+        }
+
+        /* Modern Footer */
+        .site-footer {
+            background-color: #060a12;
+            border-top: 1px solid #1f2937;
+            padding: 3rem 1.5rem 1.5rem 1.5rem;
+            margin-top: auto;
+        }
+
+        .footer-container {
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+
+        .footer-link {
+            color: #9ca3af;
+            text-decoration: none;
+            transition: color 0.2s ease;
+            font-size: 0.88rem;
+        }
+
+        .footer-link:hover {
+            color: #3b82f6;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Loader Overlay -->
+    <div class="loader-overlay" id="loaderOverlay">
+        <div class="spinner-border text-primary mb-3" style="width: 3rem; height: 3rem;" role="status"></div>
+        <h5 class="text-light fw-bold">Analyzing Media...</h5>
+        <p class="text-secondary small">Running Deep Learning Models & Forensic Signals</p>
+    </div>
+
+    <!-- Sticky Navigation Header -->
+    <header class="site-header">
+        <div class="nav-container">
+            <a href="javascript:void(0)" onclick="switchTab('home-section')" class="brand-logo">
+                <i class="fa-solid fa-shield-halved"></i>
+                <span class="brand-name">Veri<span>Pix</span></span>
+            </a>
+
+            <ul class="nav-links">
+                <li><a href="/dashboard/" class="nav-link-item">Dashboard</a></li>
+                <li><a onclick="switchTab('image-section')" id="tab-image-section" class="nav-link-item">Image</a></li>
+                <li><a onclick="switchTab('text-section')" id="tab-text-section" class="nav-link-item">Text</a></li>
+                <li><a onclick="switchTab('audio-section')" id="tab-audio-section" class="nav-link-item">Audio</a></li>
+                <li><a onclick="switchTab('history-section')" id="tab-history-section" class="nav-link-item">History</a></li>
+                <li><a onclick="switchTab('settings-section')" id="tab-settings-section" class="nav-link-item">Settings</a></li>
+            </ul>
+
+            <div class="nav-actions">
+                {% if request.user.is_authenticated %}
+                    <a href="/dashboard/" class="btn btn-outline-light btn-sm fw-semibold">
+                        <i class="fa-solid fa-gauge me-1"></i> Dashboard
+                    </a>
+                    <a href="/logout/" class="btn btn-danger btn-sm fw-semibold ms-1">Logout</a>
+                {% else %}
+                    <a href="/login/" class="btn-signin">Sign In</a>
+                    <a href="/register/" class="btn-signup">SIGN UP</a>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+
+    <!-- Home Landing Section -->
+    <div id="home-section" class="tab-content-section active">
+        <div class="hero-landing-container">
+            <div class="badge-pill mb-3">AI MEDIA FORENSICS PLATFORM</div>
+            <h1 class="hero-title mb-3">
+                AI Image, Audio & Text<br>Authenticity Detector
+            </h1>
+            <p class="hero-subtitle mx-auto mb-4">
+                Upload media, run multi-signal forensic analysis, and get a clear Real / AI verdict with confidence scores—built for enterprise review workflows.
+            </p>
+            
+            <div class="d-flex justify-content-center gap-3 mb-5">
+                <button onclick="switchTab('image-section')" class="btn btn-light fw-bold px-4 py-2 rounded-3">Get Started</button>
+                <a href="#learn-more-section" class="btn btn-outline-secondary text-light fw-semibold px-4 py-2 rounded-3">Learn More</a>
+            </div>
+        </div>
+
+        <div class="learn-more-container" id="learn-more-section">
+            <div class="container" style="max-width: 1140px;">
+                <div class="text-center mb-5">
+                    <span class="badge-pill mb-2">FORENSIC CAPABILITIES</span>
+                    <h2 class="fw-bold text-light">Explore Our AI Detection Features</h2>
+                    <p class="text-secondary small mx-auto" style="max-width: 600px;">VeriPix uses advanced neural networks and visual heatmaps to distinguish authentic human media from AI-generated fabrications.</p>
+                </div>
+
+                <!-- Feature 1: Image -->
+                <div class="feature-block">
+                    <div class="row align-items-center g-4">
+                        <div class="col-lg-6">
+                            <div class="feature-icon-badge">
+                                <i class="fa-solid fa-image"></i>
+                            </div>
+                            <span class="badge bg-primary bg-opacity-20 text-primary border border-primary mb-2">ResNet-18 & Grad-CAM</span>
+                            <h3 class="fw-bold text-light mb-3">AI Image Manipulation & Deepfake Detector</h3>
+                            <p class="text-secondary small leading-relaxed mb-3">
+                                Detect AI images generated by Midjourney, DALL-E, Stable Diffusion, and Photoshop manipulations. Get instant visual Grad-CAM heatmap overlays highlighting pixels manipulated by AI.
+                            </p>
+                            <ul class="list-unstyled text-secondary small mb-4">
+                                <li class="mb-2"><i class="fa-solid fa-check text-primary me-2"></i>Multi-file batch upload (Up to 5 images per session)</li>
+                                <li class="mb-2"><i class="fa-solid fa-check text-primary me-2"></i>Grad-CAM visual heatmap localized forensic analysis</li>
+                                <li><i class="fa-solid fa-check text-primary me-2"></i>Real vs AI confidence probability percentage</li>
+                            </ul>
+                            <button onclick="switchTab('image-section')" class="btn btn-outline-light btn-sm fw-semibold px-3 py-2">Test Image Detector</button>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="feature-img-box shadow">
+                                <img src="https://images.unsplash.com/photo-1633419461186-7d40a38105ec?auto=format&fit=crop&w=800&q=80" alt="AI Image Forensics Detection" class="feature-img">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feature 2: Text -->
+                <div class="feature-block">
+                    <div class="row align-items-center g-4 flex-lg-row-reverse">
+                        <div class="col-lg-6">
+                            <div class="feature-icon-badge">
+                                <i class="fa-solid fa-file-lines"></i>
+                            </div>
+                            <span class="badge bg-warning bg-opacity-20 text-warning border border-warning mb-2">NLP Perplexity Engine</span>
+                            <h3 class="fw-bold text-light mb-3">AI Text & Article Synthesizer Detector</h3>
+                            <p class="text-secondary small leading-relaxed mb-3">
+                                Identify content written by ChatGPT, Claude, Gemini, and LLMs. Analyze text perplexity, burstiness, and syntax structure to confirm human authorship.
+                            </p>
+                            <ul class="list-unstyled text-secondary small mb-4">
+                                <li class="mb-2"><i class="fa-solid fa-check text-warning me-2"></i>Highlighted AI-generated sentences and paragraphs</li>
+                                <li class="mb-2"><i class="fa-solid fa-check text-warning me-2"></i>Supports essay, article, and document text verification</li>
+                                <li><i class="fa-solid fa-check text-warning me-2"></i>Plagiarism & synthetic pattern probability scores</li>
+                            </ul>
+                            <button onclick="switchTab('text-section')" class="btn btn-outline-light btn-sm fw-semibold px-3 py-2">Test Text Detector</button>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="feature-img-box shadow">
+                                <img src="https://images.unsplash.com/photo-1517842645767-c639042777db?auto=format&fit=crop&w=800&q=80" alt="AI Text Detector" class="feature-img">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feature 3: Audio -->
+                <div class="feature-block">
+                    <div class="row align-items-center g-4">
+                        <div class="col-lg-6">
+                            <div class="feature-icon-badge">
+                                <i class="fa-solid fa-microphone-lines"></i>
+                            </div>
+                            <span class="badge bg-info bg-opacity-20 text-info border border-info mb-2">Spectrogram Analysis</span>
+                            <h3 class="fw-bold text-light mb-3">Synthetic Voice & Audio Deepfake Analysis</h3>
+                            <p class="text-secondary small leading-relaxed mb-3">
+                                Detect voice cloning (ElevenLabs, Bark) and audio deepfakes. Analyzes acoustic frequencies, spectrographic anomalies, and synthetic pitch transitions.
+                            </p>
+                            <ul class="list-unstyled text-secondary small mb-4">
+                                <li class="mb-2"><i class="fa-solid fa-check text-info me-2"></i>Audio spectrogram frequency visualization</li>
+                                <li class="mb-2"><i class="fa-solid fa-check text-info me-2"></i>Voice clone detection for MP3, WAV, and AAC clips</li>
+                                <li><i class="fa-solid fa-check text-info me-2"></i>Acoustic artifact pattern detection</li>
+                            </ul>
+                            <button onclick="switchTab('audio-section')" class="btn btn-outline-light btn-sm fw-semibold px-3 py-2">Test Audio Detector</button>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="feature-img-box shadow">
+                                <img src="https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&w=800&q=80" alt="AI Audio Forensic" class="feature-img">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Image Upload Section -->
+    <div id="image-section" class="tab-content-section my-auto">
+        <div class="container upload-card-wrapper">
+            <div class="text-center mb-4">
+                <h3 class="fw-bold text-light">AI Image Forensics</h3>
+                <p class="text-secondary small">Upload single or multiple images for ResNet-18 & Grad-CAM analysis</p>
+            </div>
+            <form id="uploadForm" action="/detect/" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <input type="file" id="imageInput" name="images" multiple accept="image/*" class="d-none" onchange="handleFileSelect(this)">
+                <div class="upload-card shadow-lg text-center" id="dropZone" onclick="document.getElementById('imageInput').click()">
+                    <div class="mb-3">
+                        <i class="fa-solid fa-cloud-arrow-up text-primary display-4"></i>
+                    </div>
+                    <h5 class="fw-bold text-light mb-1" id="uploadTitle">Click or Drag Images Here</h5>
+                    <p class="text-secondary small mb-0" id="uploadSubtext">Supports PNG, JPG, JPEG, WEBP</p>
+                    <div id="selectedFilesBadge" class="mt-3 text-info small fw-bold"></div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Audio Section -->
+    <div id="audio-section" class="tab-content-section my-auto py-5">
+        <div class="container" style="max-width: 700px;">
+            <div class="text-center mb-4">
+                <i class="fa-solid fa-microphone-lines text-primary display-3 mb-3"></i>
+                <h3 class="fw-bold text-light">AI Audio Detector</h3>
+                <p class="text-secondary small">Upload audio clips to analyze deepfake voice synthesis and manipulation.</p>
+            </div>
+            <form action="/detect-audio/" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="card bg-dark border-secondary p-4 text-center">
+                    <input type="file" name="audio" accept="audio/*" class="form-control bg-black text-light border-secondary mb-3">
+                    <button type="submit" class="btn btn-primary fw-bold" onclick="showLoader()"><i class="fa-solid fa-wave-square me-2"></i> Analyze Audio</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Text Section -->
+    <div id="text-section" class="tab-content-section my-auto py-5">
+        <div class="container" style="max-width: 800px;">
+            <div class="text-center mb-4">
+                <i class="fa-solid fa-file-lines text-primary display-3 mb-3"></i>
+                <h3 class="fw-bold text-light">AI Text Detector</h3>
+                <p class="text-secondary small">Paste text or articles to detect ChatGPT / AI generated content.</p>
+            </div>
+            <form action="/detect-text/" method="POST">
+                {% csrf_token %}
+                <div class="card bg-dark border-secondary p-4">
+                    <textarea name="text_content" class="form-control bg-black text-light border-secondary mb-3" rows="6" placeholder="Paste article, paper, or essay text here..."></textarea>
+                    <button type="submit" class="btn btn-primary fw-bold w-100" onclick="showLoader()"><i class="fa-solid fa-magnifying-glass me-2"></i> Scan Text Perplexity</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Live History Section -->
+    <div id="history-section" class="tab-content-section my-5">
+        <div class="container" style="max-width: 1200px;">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h3 class="fw-bold text-light mb-1">Detection History</h3>
+                    <p class="text-secondary small mb-0">View, search, and export past AI forensic analysis reports</p>
+                </div>
+                <a href="/export-csv/" class="btn btn-outline-primary btn-sm fw-semibold" id="exportCsvBtn"><i class="fa-solid fa-download me-1"></i> Export CSV</a>            </div>
+
+            <!-- Dynamic Live Summary Stats Grid -->
+            <div class="row g-3 mb-4">
+                <div class="col-md-3 col-6">
+                    <div class="bg-dark border border-secondary p-3 rounded-3">
+                        <span class="text-secondary small d-block">Total Scans</span>
+                        <h4 class="fw-bold text-light mb-0 mt-1" id="statTotalScans">0</h4>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="bg-dark border border-secondary p-3 rounded-3">
+                        <span class="text-secondary small d-block">AI / Fake Flagged</span>
+                        <h4 class="fw-bold text-danger mb-0 mt-1" id="statFakeScans">0</h4>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="bg-dark border border-secondary p-3 rounded-3">
+                        <span class="text-secondary small d-block">Authentic / Real</span>
+                        <h4 class="fw-bold text-success mb-0 mt-1" id="statRealScans">0</h4>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="bg-dark border border-secondary p-3 rounded-3">
+                        <span class="text-secondary small d-block">Avg. Confidence Score</span>
+                        <h4 class="fw-bold text-primary mb-0 mt-1" id="statAvgScore">0%</h4>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search & Filter Bar -->
+            <div class="card bg-dark border-secondary p-3 mb-4 rounded-3">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <span class="input-group-text bg-black border-secondary text-secondary"><i class="fa-solid fa-magnifying-glass"></i></span>
+                            <input type="text" id="historySearchInput" class="form-control bg-black border-secondary text-light ps-2" placeholder="Search by file name or scan ID...">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <select id="mediaTypeFilter" class="form-select bg-black border-secondary text-light">
+                            <option value="">All Media Types</option>
+                            <option value="IMAGE">Image</option>
+                            <option value="AUDIO">Audio</option>
+                            <option value="TEXT">Text</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <select id="verdictFilter" class="form-select bg-black border-secondary text-light">
+                            <option value="">All Verdicts</option>
+                            <option value="AI / FAKE">AI / Fake Only</option>
+                            <option value="REAL">Real Only</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Live History Data Table -->
+            <div class="card bg-dark border-secondary p-4 rounded-3">
+                <div class="table-responsive">
+                    <table class="table table-dark table-hover align-middle mb-0" id="historyTable">
+                        <thead>
+                            <tr class="text-secondary text-uppercase small">
+                                <th>Type</th>
+                                <th>File Name</th>
+                                <th>Verdict</th>
+                                <th>Confidence Score</th>
+                                <th>Timestamp</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyTableBody">
+                            <!-- Populated dynamically via JS engine -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+ <!-- HTML -->
+<!-- Settings Section Start -->
+<!-- SweetAlert2 CDN for Dark Theme Popups -->
+{% if 'settings' in request.path %}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<div id="settings-section" class="my-5">
+    <div class="container" style="max-width: 1100px;">
+        
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h3 class="fw-bold text-light mb-1">Account & Preferences</h3>
+                <p class="text-secondary small mb-0">Manage profile details, forensic model sensitivities, and API keys.</p>
+            </div>
+        </div>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="row g-4">
+            
+            <!-- LEFT COLUMN: Profile & Password -->
+            <div class="col-lg-6 col-md-12">
+                
+                <!-- Profile Information Card -->
+                <div class="card bg-dark border-secondary p-4 rounded-3 text-start mb-4 shadow-sm">
+                    <h5 class="fw-bold text-light mb-4"><i class="fa-solid fa-user-gear me-2 text-primary"></i>Profile Information</h5>
+                    
+                    <!-- Profile Pic & Details Form -->
+                    <div class="d-flex align-items-center gap-3 mb-4 p-3 rounded-3" style="background-color: #161e2e;">
+                        <div style="width: 80px; height: 80px; border-radius: 50%; overflow: hidden; border: 2px solid #3b82f6;" class="flex-shrink-0">
+                            {% if profile.profile_pic and profile.profile_pic.url and profile.profile_pic.name != 'profile_pics/default.png' %}
+                                <img id="avatarPreview" src="{{ profile.profile_pic.url }}" alt="Profile Picture" style="width: 100%; height: 100%; object-fit: cover;">
+                            {% else %}
+                                <img id="avatarPreview" src="https://ui-avatars.com/api/?name={{ request.user.username }}&background=0D8ABC&color=fff" alt="Profile Picture" style="width: 100%; height: 100%; object-fit: cover;">
+                            {% endif %}
+                        </div>
+
+                        <div>
+                            <h6 class="text-light fw-bold mb-1">{{ request.user.username|title }}</h6>
+                            <p class="text-secondary small mb-2">JPG, PNG max 2MB</p>
+                            <div class="d-flex gap-2">
+                                <label for="imgUpload" class="btn btn-sm btn-primary mb-0 style-pointer">
+                                    <i class="fa-solid fa-upload me-1"></i> Upload Pic
+                                </label>
+                                
+                                {% if profile.profile_pic and profile.profile_pic.name != 'profile_pics/default.png' %}
+                                <form id="deletePicForm" action="{% url 'settings' %}" method="POST" class="d-inline">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="delete_pic">
+                                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="confirmDeletePic()">
+                                        <i class="fa-solid fa-trash me-1"></i> Delete Pic
+                                    </button>
+                                </form>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <form action="{% url 'settings' %}" method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="save_profile">
+                        <input type="file" id="imgUpload" name="profile_pic" accept="image/*" class="d-none" onchange="this.form.submit()">
+
+                        <div class="mb-3">
+                            <label class="form-label small text-secondary">Username</label>
+                            <input type="text" name="username" class="form-control bg-dark text-light border-secondary" value="{{ request.user.username }}" required>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label small text-secondary">Email Address</label>
+                            <input type="email" name="email" class="form-control bg-dark text-light border-secondary" value="{{ request.user.email }}" required>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fa-solid fa-floppy-disk me-2"></i>Save Profile Changes
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Password Change Card -->
+                <div class="card bg-dark border-secondary p-4 rounded-3 text-start shadow-sm mb-4">
+                    <h5 class="fw-bold text-light mb-3"><i class="fa-solid fa-key me-2 text-primary"></i>Change Password</h5>
+                    
+                    <form action="{% url 'settings' %}" method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="change_password">
+
+                        <div class="mb-3">
+                            <label class="form-label small text-secondary">Current Password</label>
+                            <input type="password" name="current_password" class="form-control bg-dark text-light border-secondary" required placeholder="••••••••">
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label small text-secondary">New Password</label>
+                            <input type="password" name="new_password" class="form-control bg-dark text-light border-secondary" required placeholder="••••••••">
+                        </div>
+
+                        <button type="submit" class="btn btn-outline-primary w-100">
+                            <i class="fa-solid fa-shield-halved me-2"></i>Update Password
+                        </button>
+                    </form>
+                </div>
+
+            </div>
+
+            <!-- RIGHT COLUMN: Model Prefs, API & Danger Zone -->
+            <div class="col-lg-6 col-md-12">
+                
+                <!-- Detection & Model Preferences -->
+                <div class="card bg-dark border-secondary p-4 rounded-3 text-start mb-4 shadow-sm">
+                    <h5 class="fw-bold text-light mb-3"><i class="fa-solid fa-sliders me-2 text-primary"></i>Detection & Model Preferences</h5>
+                    
+                    <div class="mb-3">
+                        <label class="form-label small text-secondary">Default Detection Engine</label>
+                        <select class="form-select bg-dark text-light border-secondary">
+                            <option selected>ResNet-18 (CIFAKE Trained - Fast & Precise)</option>
+                            <option value="efficientnet_b0">EfficientNet-B0 (High Accuracy - Fine Features)</option>                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small text-secondary d-flex justify-content-between">
+                            AI Flagging Sensitivity Threshold <span>86%</span>
+                        </label>
+                        <input type="range" class="form-range" min="50" max="99" value="86">
+                    </div>
+
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="gradCamCheck" checked>
+                        <label class="form-check-label text-light small" for="gradCamCheck">Auto-render Grad-CAM Heatmaps on image upload</label>
+                    </div>
+                </div>
+
+                <!-- Danger Zone -->
+                <div class="card bg-dark border-danger p-4 rounded-3 text-start shadow-sm">
+                    <h5 class="fw-bold text-danger mb-2"><i class="fa-solid fa-triangle-exclamation me-2"></i>Danger Zone</h5>
+                    <p class="small text-secondary mb-3">Permanent actions regarding your scan history data.</p>
+
+                    <form id="dangerZoneForm" action="{% url 'settings' %}" method="POST" class="d-flex flex-column gap-2">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" id="dangerAction" value="">
+                        
+                        <button type="button" class="btn btn-outline-danger btn-sm text-start" onclick="confirmClearHistory()">
+                            <i class="fa-solid fa-eraser me-2"></i>Clear All Scan History
+                        </button>
+                        <button type="button" class="btn btn-danger btn-sm text-start" onclick="confirmDeleteAccount()">
+                            <i class="fa-solid fa-user-xmark me-2"></i>Delete Profile Permanently
+                        </button>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SweetAlert2 Scripts -->
+<script>
+    const darkSwal = Swal.mixin({
+        background: '#161e2e',
+        color: '#ffffff',
+        confirmButtonColor: '#dc3545',
+        cancelButtonColor: '#6c757d',
+        customClass: {
+            popup: 'border border-secondary rounded-3'
+        }
+    });
+
+    // 1. Delete Profile Picture Modal
+    function confirmDeletePic() {
+        darkSwal.fire({
+            title: 'Remove Profile Picture?',
+            text: "Your avatar will reset to default.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('deletePicForm').submit();
+            }
+        });
+    }
+
+    // 2. Clear History Modal
+    function confirmClearHistory() {
+        darkSwal.fire({
+            title: 'Clear Scan History?',
+            text: "This action cannot be undone!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, clear history!',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('dangerAction').value = 'clear_history';
+                document.getElementById('dangerZoneForm').submit();
+            }
+        });
+    }
+
+    // 3. Delete Account Modal
+    function confirmDeleteAccount() {
+        darkSwal.fire({
+            title: 'Delete Account Permanently?',
+            text: "All your data and history will be lost forever!",
+            icon: 'error',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete my account!',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('dangerAction').value = 'delete_account';
+                document.getElementById('dangerZoneForm').submit();
+            }
+        });
+    }
+</script>
+{% endif %}
+<!-- Settings Section End -->
+
+<script>
+    function previewImage(event) {
+        var reader = new FileReader();
+        reader.onload = function(){
+            var output = document.getElementById('avatarPreview');
+            output.src = reader.result;
+        };
+        if(event.target.files[0]) {
+            reader.readAsDataURL(event.target.files[0]);
+        }
+    }
+</script>
+
+    <!-- Site Footer -->
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="row g-4 mb-4">
+                <div class="col-lg-4 col-md-6">
+                    <a href="javascript:void(0)" onclick="switchTab('home-section')" class="brand-logo mb-3 d-inline-flex">
+                        <i class="fa-solid fa-shield-halved"></i>
+                        <span class="brand-name">Veri<span>Pix</span></span>
+                    </a>
+                    <p class="text-secondary small leading-relaxed">
+                        VeriPix is an enterprise deep learning forensic platform providing instant authenticity verification for digital images, synthetic audio, and AI texts.
+                    </p>
+                </div>
+                <div class="col-lg-2 col-md-6 col-6">
+                    <h6 class="text-light fw-bold mb-3 small">FEATURES</h6>
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-2"><a href="javascript:void(0)" onclick="switchTab('image-section')" class="footer-link">Image Forensics</a></li>
+                        <li class="mb-2"><a href="javascript:void(0)" onclick="switchTab('audio-section')" class="footer-link">Voice Deepfakes</a></li>
+                        <li class="mb-2"><a href="javascript:void(0)" onclick="switchTab('text-section')" class="footer-link">AI Text Detector</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-2 col-md-6 col-6">
+                    <h6 class="text-light fw-bold mb-3 small">RESOURCES</h6>
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-2"><a href="#learn-more-section" onclick="switchTab('home-section')" class="footer-link">Documentation</a></li>
+                        <li class="mb-2"><a href="/dashboard/" class="footer-link">Dashboard</a></li>
+                        <li class="mb-2"><a href="#" class="footer-link">API Access</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <h6 class="text-light fw-bold mb-3 small">SYSTEM STATUS</h6>
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <span class="spinner-grow spinner-grow-sm text-success" role="status"></span>
+                        <span class="text-light small fw-semibold">ResNet-18 AI Model Online</span>
+                    </div>
+                    <p class="text-secondary small">Grad-CAM Visual Engine Ready</p>
+                </div>
+            </div>
+
+            <div class="border-top border-secondary border-opacity-25 pt-3 d-flex flex-column flex-sm-row justify-content-between align-items-center gap-2">
+                <span class="text-secondary small">&copy; 2026 VeriPix AI Authenticity Detector. All rights reserved.</span>
+            </div>
+        </div>
+    </footer>
+
+
+<!-- Universal Live Backend Script -->
+<script>
+    function switchTab(sectionId) {
+        document.querySelectorAll('.tab-content-section').forEach(sec => sec.classList.remove('active'));
+        document.querySelectorAll('.nav-link-item').forEach(link => link.classList.remove('active'));
+
+        const targetSection = document.getElementById(sectionId);
+        if (targetSection) targetSection.classList.add('active');
+
+        const targetTab = document.getElementById('tab-' + sectionId);
+        if (targetTab) targetTab.classList.add('active');
+
+        if (sectionId === 'history-section') {
+            startLiveHistoryPolling();
+        }
+
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function showLoader() {
+        const loader = document.getElementById('loaderOverlay');
+        if (loader) loader.style.display = 'flex';
+    }
+
+    function handleFileSelect(input) {
+        if (input.files && input.files.length > 0) {
+            const count = input.files.length;
+            const fileBadge = document.getElementById('selectedFilesBadge');
+            if (fileBadge) {
+                fileBadge.innerText = `${count} file(s) selected: ` + Array.from(input.files).map(f => f.name).join(', ');
+            }
+            showLoader();
+            document.getElementById('uploadForm').submit();
+        }
+    }
+
+    function startLiveHistoryPolling() {
+        fetch('/api/history/')
+            .then(response => {
+                if (!response.ok) throw new Error('API Response Failed');
+                return response.json();
+            })
+            .then(data => {
+                const totalEl = document.getElementById('statTotalScans');
+                const fakeEl = document.getElementById('statFakeScans');
+                const realEl = document.getElementById('statRealScans');
+                const avgEl = document.getElementById('statAvgScore');
+
+                if (totalEl) totalEl.innerText = data.total_scans;
+                if (fakeEl) fakeEl.innerText = data.fake_count;
+                if (realEl) realEl.innerText = data.real_count;
+                if (avgEl) avgEl.innerText = data.avg_confidence + '%';
+
+                const tbody = document.querySelector('#historyTable tbody') || document.getElementById("historyTableBody");
+                if (tbody) {
+                    if (!data.logs || data.logs.length === 0) {
+                        tbody.innerHTML = `
+                            <tr>
+                                <td colspan="6" class="text-center text-secondary py-5">
+                                    <i class="fa-solid fa-folder-open mb-2 text-muted" style="font-size: 2rem;"></i>
+                                    <p class="mb-0">No scan history recorded yet in Database.</p>
+                                </td>
+                            </tr>`;
+                        return;
+                    }
+
+                    let rowsHTML = '';
+                    data.logs.forEach(log => {
+                        const verdictStr = String(log.verdict).toUpperCase();
+                        const isAI = ['AI', 'FAKE', 'AI / FAKE'].includes(verdictStr);
+                        
+                        const verdictBadge = isAI 
+                            ? `<span class="badge bg-danger bg-opacity-20 text-danger border border-danger px-2 py-1"><i class="fa-solid fa-triangle-exclamation me-1"></i> AI / FAKE</span>`
+                            : `<span class="badge bg-success bg-opacity-20 text-success border border-success px-2 py-1"><i class="fa-solid fa-circle-check me-1"></i> REAL</span>`;
+                        
+                        const progressColor = isAI ? 'bg-danger' : 'bg-success';
+
+                        rowsHTML += `
+                        <tr class="history-row" data-filename="${String(log.file_name).toLowerCase()}" data-type="${String(log.file_type).toLowerCase()}" data-verdict="${isAI ? 'fake' : 'real'}">
+                            <td><span class="badge bg-secondary bg-opacity-20 text-info border border-secondary" style="font-size: 0.75rem;">${log.file_type}</span></td>
+                            <td class="fw-semibold text-light filename-cell">${log.file_name}</td>
+                            <td>${verdictBadge}</td>
+                            <td>
+                                <div class="d-flex align-items-center gap-2" style="max-width: 140px;">
+                                    <div class="progress flex-grow-1" style="height: 6px; background: #1f2937;">
+                                        <div class="progress-bar ${progressColor}" style="width: ${log.confidence_score}%;"></div>
+                                    </div>
+                                    <span class="small fw-bold text-light">${log.confidence_score}%</span>
+                                </div>
+                            </td>
+                            <td class="text-secondary small">${log.created_at}</td>
+                            <td class="text-end">
+                                <a href="/heatmap/${log.id}/" class="btn btn-sm btn-outline-primary me-1" title="View Heatmap"><i class="fa-solid fa-eye"></i></a>
+                                <button type="button" class="btn btn-sm btn-outline-danger" onclick="openDeleteModal('${log.id}', '${log.file_name}')" title="Delete">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>`;
+                    });
+                    tbody.innerHTML = rowsHTML;
+                    applyHistoryFilters();
+                }
+            })
+            .catch(err => console.error("Live Fetch Error:", err));
+    }
+
+    // Modal Dynamic Trigger with File Name Display
+    function openDeleteModal(logId, fileName) {
+        const deleteForm = document.getElementById('deleteModalForm');
+        const csrfTokenInput = document.getElementById('modalCsrfToken');
+        const fileNameDisplay = document.getElementById('deleteFileNameDisplay');
+
+        if (deleteForm && csrfTokenInput) {
+            deleteForm.action = `/delete_log/${logId}/`;
+            csrfTokenInput.value = getCsrfToken();
+            if (fileNameDisplay) {
+                fileNameDisplay.innerText = fileName || 'Selected Item';
+            }
+
+            const deleteModal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
+            deleteModal.show();
+        }
+    }
+
+    function applyHistoryFilters() {
+        const searchInput = document.getElementById('historySearchInput');
+        const mediaSelect = document.getElementById('mediaTypeFilter') || document.getElementById('historyMediaFilter');
+        const verdictSelect = document.getElementById('verdictFilter') || document.getElementById('historyVerdictFilter');
+
+        const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
+        const selectedMedia = mediaSelect ? mediaSelect.value.toLowerCase().trim() : '';
+        const selectedVerdict = verdictSelect ? verdictSelect.value.toLowerCase().trim() : '';
+
+        const rows = document.querySelectorAll('.history-row');
+        let visibleCount = 0;
+
+        rows.forEach(row => {
+            const fileName = row.getAttribute('data-filename') || '';
+            const fileType = row.getAttribute('data-type') || '';
+            const verdict = row.getAttribute('data-verdict') || '';
+
+            const matchesSearch = !query || fileName.includes(query);
+            const matchesMedia = !selectedMedia || fileType === selectedMedia;
+            
+            let matchesVerdict = true;
+            if (selectedVerdict === 'real') {
+                matchesVerdict = (verdict === 'real');
+            } else if (selectedVerdict === 'ai / fake' || selectedVerdict === 'fake') {
+                matchesVerdict = (verdict === 'fake');
+            }
+
+            if (matchesSearch && matchesMedia && matchesVerdict) {
+                row.style.display = '';
+                visibleCount++;
+            } else {
+                row.style.display = 'none';
+            }
+        });
+
+        const tbody = document.querySelector('#historyTable tbody') || document.getElementById("historyTableBody");
+        const existingNoData = document.getElementById('noFilterResultsRow');
+        
+        if (visibleCount === 0 && rows.length > 0) {
+            if (!existingNoData && tbody) {
+                const noRow = document.createElement('tr');
+                noRow.id = 'noFilterResultsRow';
+                noRow.innerHTML = `
+                    <td colspan="6" class="text-center text-secondary py-4">
+                        <i class="fa-solid fa-filter-circle-xmark me-2"></i>
+                        No detection records match your selected filters.
+                    </td>`;
+                tbody.appendChild(noRow);
+            }
+        } else if (existingNoData) {
+            existingNoData.remove();
+        }
+    }
+
+    function getCsrfToken() {
+        const input = document.querySelector('[name=csrfmiddlewaretoken]');
+        return input ? input.value : '';
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('imageInput');
+
+        if (dropZone && fileInput) {
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                dropZone.addEventListener(eventName, e => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }, false);
+            });
+
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropZone.addEventListener(eventName, () => dropZone.classList.add('dragover'), false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropZone.addEventListener(eventName, () => dropZone.classList.remove('dragover'), false);
+            });
+
+            dropZone.addEventListener('drop', e => {
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    fileInput.files = files;
+                    handleFileSelect(fileInput);
+                }
+            });
+        }
+
+        const searchInput = document.getElementById('historySearchInput');
+        const mediaSelect = document.getElementById('mediaTypeFilter') || document.getElementById('historyMediaFilter');
+        const verdictSelect = document.getElementById('verdictFilter') || document.getElementById('historyVerdictFilter');
+
+        if (searchInput) searchInput.addEventListener('keyup', applyHistoryFilters);
+        if (mediaSelect) mediaSelect.addEventListener('change', applyHistoryFilters);
+        if (verdictSelect) verdictSelect.addEventListener('change', applyHistoryFilters);
+
+        const exportBtn = document.getElementById('btnExportCSV') || document.getElementById('exportCsvBtn');
+        if (exportBtn && exportBtn.tagName === 'A') {
+            exportBtn.setAttribute('href', '/export-csv/');
+        }
+
+        startLiveHistoryPolling();
+        setInterval(startLiveHistoryPolling, 4000);
+    });
+</script>
+
+<!-- Redesigned Professional Delete Modal -->
+<div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content text-light border-0 shadow-lg" style="background-color: #0f172a; border-radius: 12px; border: 1px solid #1e293b !important;">
+      <div class="modal-header border-bottom border-secondary border-opacity-20 px-4 pt-4 pb-3">
+        <div class="d-flex align-items-center gap-2">
+          <div class="rounded-circle bg-danger bg-opacity-10 p-2 d-flex align-items-center justify-content-center" style="width: 38px; height: 38px;">
+            <i class="fa-solid fa-trash-can text-danger fs-5"></i>
+          </div>
+          <h5 class="modal-title fw-bold text-white mb-0" style="font-size: 1.1rem;">Delete Scan Record</h5>
+        </div>
+        <button type="button" class="btn-close btn-close-white opacity-75" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      
+      <div class="modal-body px-4 py-3">
+        <p class="text-secondary small mb-3">Are you sure you want to permanently delete this forensic analysis record? This action cannot be undone.</p>
+        
+        <!-- Target File Name Badge -->
+        <div class="p-3 rounded-3 d-flex align-items-center justify-content-between" style="background-color: #1e293b; border: 1px solid #334155;">
+          <span class="text-secondary small fw-medium">Selected File:</span>
+          <span id="deleteFileNameDisplay" class="fw-bold text-info font-monospace small text-truncate ms-2" style="max-width: 220px;">-</span>
+        </div>
+      </div>
+      
+      <div class="modal-footer border-top border-secondary border-opacity-20 px-4 py-3 bg-opacity-10" style="background-color: #0b0f19;">
+        <button type="button" class="btn btn-sm btn-outline-secondary px-3 py-2 rounded-2 fw-medium" data-bs-dismiss="modal">Cancel</button>
+        <form id="deleteModalForm" method="POST" action="">
+          <input type="hidden" name="csrfmiddlewaretoken" id="modalCsrfToken">
+          <button type="submit" class="btn btn-sm btn-danger px-4 py-2 rounded-2 fw-semibold shadow-sm">Delete Record</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

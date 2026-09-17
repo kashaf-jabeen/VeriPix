@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VeriPix - AI Image Detection</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        :root {
+            --bg-dark: #070a12;
+            --card-bg: #0d1322;
+            --card-border: #1a233a;
+            --accent-blue: #2563eb;
+            --accent-light-blue: #3b82f6;
+            --text-main: #e2e8f0;
+            --text-muted: #94a3b8;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* VeriPix Exact Navbar */
+        .navbar {
+            background-color: #0b101d;
+            border-bottom: 1px solid var(--card-border);
+            padding: 0.8rem 2rem;
+        }
+
+        .brand-logo {
+            color: #38bdf8;
+            font-weight: 700;
+            font-size: 1.4rem;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-pill-group {
+            background-color: #131b2e;
+            padding: 4px;
+            border-radius: 8px;
+            border: 1px solid #1e293b;
+        }
+
+        .nav-pill-btn {
+            color: var(--text-muted);
+            padding: 6px 18px;
+            border-radius: 6px;
+            font-size: 0.88rem;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .nav-pill-btn:hover { color: var(--text-main); }
+
+        .nav-pill-btn.active {
+            background-color: #1e293b;
+            color: #ffffff;
+            font-weight: 500;
+        }
+
+        .user-badge {
+            color: #38bdf8;
+            font-size: 0.88rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-logout {
+            background-color: transparent;
+            border: 1px solid #dc2626;
+            color: #ef4444;
+            border-radius: 6px;
+            padding: 5px 14px;
+            font-size: 0.82rem;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .btn-logout:hover {
+            background-color: #dc2626;
+            color: #ffffff;
+        }
+
+        /* Layout Styling */
+        .detection-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .drop-zone {
+            border: 1px dashed #2a364f;
+            border-radius: 10px;
+            background-color: #0a0e1a;
+            padding: 2.5rem 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .drop-zone:hover {
+            border-color: var(--accent-light-blue);
+            background-color: #101728;
+        }
+
+        .img-preview-box {
+            background-color: #000000;
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            height: 220px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .img-preview-box img {
+            max-height: 100%;
+            max-width: 100%;
+            object-fit: contain;
+        }
+
+        .heatmap-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            text-align: center;
+            padding: 15px;
+        }
+
+        .badge-fake {
+            background-color: #dc2626;
+            color: #ffffff;
+            font-size: 0.75rem;
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
+
+        .badge-real {
+            background-color: #16a34a;
+            color: #ffffff;
+            font-size: 0.75rem;
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
+
+        .btn-cam {
+            background-color: #2563eb;
+            color: #ffffff;
+            border: none;
+            border-radius: 6px;
+            padding: 6px 16px;
+            font-size: 0.85rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-cam:hover { background-color: #1d4ed8; }
+
+        .btn-del-icon {
+            background: transparent;
+            border: 1px solid #7f1d1d;
+            color: #ef4444;
+            border-radius: 6px;
+            padding: 2px 8px;
+            font-size: 0.8rem;
+        }
+
+        .btn-del-icon:hover {
+            background: #dc2626;
+            color: #ffffff;
+        }
+
+        footer {
+            background-color: #0b101d;
+            border-top: 1px solid var(--card-border);
+            margin-top: auto;
+            padding: 1rem 0;
+        }
+
+        .loader-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(7, 10, 18, 0.88);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            flex-direction: column;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Loader -->
+    <div class="loader-overlay" id="loaderOverlay">
+        <div class="spinner-border text-primary mb-3" style="width: 3rem; height: 3rem;" role="status"></div>
+        <h5 class="text-light fw-bold">Analyzing Image...</h5>
+    </div>
+
+    <!-- Exact VeriPix Navbar -->
+    <nav class="navbar d-flex justify-content-between align-items-center">
+        <a class="brand-logo" href="/">
+            <i class="fa-solid fa-shield-halved"></i> VeriPix
+        </a>
+
+        <div class="nav-pill-group d-flex gap-1">
+            <a href="/dashboard/" class="nav-pill-btn"><i class="fa-solid fa-chart-simple"></i> Dashboard</a>
+            <a href="/detect/" class="nav-pill-btn active"><i class="fa-regular fa-image"></i> Image</a>
+        </div>
+
+        <div class="d-flex align-items-center gap-3">
+            {% if user.is_authenticated %}
+                <div class="user-badge">
+                    <i class="fa-solid fa-circle-user"></i>
+                    <span>{{ user.username }}</span>
+                </div>
+                <a href="/logout/" class="btn-logout">
+                    <i class="fa-solid fa-right-from-bracket"></i> Logout
+                </a>
+            {% else %}
+                <a href="/login/" class="btn btn-primary btn-sm px-3">Sign In</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <!-- Main Section -->
+    <div class="container py-4">
+        <div class="mb-4">
+            <h3 class="fw-bold mb-1">Image detection</h3>
+            <p class="text-secondary small">Upload an image to run AI authenticity analysis with forensic scoring.</p>
+        </div>
+
+        <div class="row g-4">
+            <!-- Form Card -->
+            <div class="col-lg-5">
+                <div class="detection-card position-sticky" style="top: 20px;">
+                    <h6 class="fw-bold mb-1">Upload image</h6>
+                    <p class="text-secondary small mb-3">Drop a JPG, PNG, or WEBP file, then run detection.</p>
+                    
+                    <form id="detectionForm" action="/detect/" method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <input type="file" id="imageInput" name="images" accept="image/*" class="d-none" onchange="handleFileSelect(this)">
+                        
+                        <div class="drop-zone" id="dropZone" onclick="document.getElementById('imageInput').click()">
+                            <i class="fa-solid fa-cloud-arrow-up text-primary fs-1 mb-2"></i>
+                            <div class="fw-semibold text-light mb-1" id="uploadTitle">Drag & drop an image</div>
+                            <div class="text-secondary small" id="uploadSub">JPG, PNG, or WEBP — click to browse</div>
+                        </div>
+                    </form>
+
+                    <div class="mt-4 pt-3 border-top border-secondary border-opacity-25 d-flex gap-2">
+                        <button type="button" class="btn btn-primary px-4 fw-semibold" onclick="submitAnalysis()">
+                            <i class="fa-solid fa-magnifying-glass me-1"></i> Detect
+                        </button>
+                        {% if results %}
+                            <a href="/clear/" class="btn btn-outline-secondary px-3">Clear History</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- History List -->
+            <div class="col-lg-7">
+                {% if results or log_item %}
+                    {% for item in results %}
+                        <div class="detection-card mb-4" id="card-box-{{ item.id|default:forloop.counter }}">                            
+                            <!-- Header & Delete -->
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div>
+                                    <h6 class="fw-bold mb-0">Detection result</h6>
+                                    <span class="text-secondary small">{{ item.filename }}</span>
+                                </div>
+                                <div class="d-flex align-items-center gap-2">
+                                    {% if item.prediction == 'FAKE' or item.verdict == 'AI' %}
+                                        <span class="badge badge-fake fw-bold">AI / FAKE</span>
+                                    {% else %}
+                                        <span class="badge badge-real fw-bold">REAL</span>
+                                    {% endif %}
+                                    <button type="button" class="btn btn-del-icon" onclick="deleteCardPermanently('{{ item.id }}', 'card-box-{{ item.id|default:forloop.counter }}')">
+                                        <i class="fa-solid fa-trash-can"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Confidence -->
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between small mb-1">
+                                    <span class="text-secondary">Confidence Score</span>
+                                    <span class="fw-bold text-light">{{ item.confidence }}%</span>
+                                </div>
+                                <div class="progress" style="height: 6px; background-color: #1a233a;">
+                                    <div class="progress-bar {% if item.prediction == 'FAKE' or item.verdict == 'AI' %}bg-danger{% else %}bg-success{% endif %}" style="width: {{ item.confidence }}%;"></div>
+                                </div>
+                            </div>
+
+                            <!-- Images -->
+                            <div class="row g-3 mb-3">
+                                <div class="col-6 text-center">
+                                    <span class="text-secondary small d-block mb-1">Original Image</span>
+                                    <div class="img-preview-box">
+                                        <img src="{{ item.image_url }}" alt="Original">
+                                    </div>
+                                </div>
+                                <div class="col-6 text-center">
+                                    <span class="text-primary small d-block mb-1">Grad-CAM Heatmap</span>
+                                    <div class="img-preview-box">
+                                        <div class="heatmap-placeholder" id="placeholder-{{ item.id|default:forloop.counter }}" {% if request.GET.show_heatmap and request.GET.log_id == item.id|stringformat:"s" %}style="display:none;"{% endif %}>
+                                            <i class="fa-solid fa-eye-slash fs-3 mb-2 opacity-50"></i>
+                                            <span class="small">Click 'Grad-CAM' to view heatmap</span>
+                                        </div>
+
+                                        <img id="heatmapImg-{{ item.id|default:forloop.counter }}" 
+                                             src="{{ item.gradcam_url }}" 
+                                             onerror="this.onerror=null; this.src='{{ item.image_url }}';" 
+                                             style="{% if request.GET.show_heatmap and request.GET.log_id == item.id|stringformat:"s" %}display:block;{% else %}display:none;{% endif %}" 
+                                             alt="Heatmap">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button type="button" class="btn btn-cam" onclick="toggleHeatmap('{{ item.id|default:forloop.counter }}')">
+                                <i class="fa-solid fa-eye"></i> Grad-CAM
+                            </button>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="detection-card d-flex flex-column align-items-center justify-content-center py-5 text-center" style="min-height: 350px;">
+                        <i class="fa-solid fa-layer-group text-secondary fs-1 mb-3 opacity-25"></i>
+                        <h6 class="fw-semibold text-light">Detection results will appear here after you analyze an image.</h6>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- VeriPix Footer -->
+    <footer>
+        <div class="container d-flex justify-content-between text-secondary small">
+            <div>&copy; 2026 <strong>VeriPix AI Forensics</strong>. All rights reserved.</div>
+            <div class="d-flex gap-3">
+                <a href="/dashboard/" class="text-secondary text-decoration-none">Dashboard</a>
+                <a href="/detect/" class="text-secondary text-decoration-none">Image Forensics</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        function handleFileSelect(input) {
+            if (input.files && input.files[0]) {
+                document.getElementById('uploadTitle').innerText = input.files[0].name;
+                document.getElementById('uploadSub').innerText = "File selected. Click 'Detect' to analyze.";
+            }
+        }
+
+        function submitAnalysis() {
+            const input = document.getElementById('imageInput');
+            if (!input.files || input.files.length === 0) {
+                Swal.fire({
+                    title: 'No Image Selected',
+                    text: 'Please select an image file first.',
+                    icon: 'info',
+                    background: '#0d1322',
+                    color: '#e2e8f0',
+                    confirmButtonColor: '#2563eb'
+                });
+                return;
+            }
+            document.getElementById('loaderOverlay').style.display = 'flex';
+            document.getElementById('detectionForm').submit();
+        }
+
+        function toggleHeatmap(index) {
+            const placeholder = document.getElementById('placeholder-' + index);
+            const img = document.getElementById('heatmapImg-' + index);
+
+            if (img.style.display === "none") {
+                placeholder.style.display = "none";
+                img.style.display = "block";
+            } else {
+                img.style.display = "none";
+                placeholder.style.display = "flex";
+            }
+        }
+
+        /* Permanent Backend Deletion */
+        function deleteCardPermanently(logId, elemId) {
+            Swal.fire({
+                title: 'Delete this image?',
+                text: "It will be permanently removed from your history.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc2626',
+                cancelButtonColor: '#1e293b',
+                confirmButtonText: 'Yes, delete it!',
+                background: '#0d1322',
+                color: '#e2e8f0'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch(`/delete_log/${logId}/`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': '{{ csrf_token }}',
+                            'Content-Type': 'application/json'
+                        }
+                    }).then(response => {
+                        const elem = document.getElementById(elemId);
+                        if(elem) elem.remove();
+                    }).catch(err => {
+                        const elem = document.getElementById(elemId);
+                        if(elem) elem.remove();
+                    });
+                }
+            });
+        }
+
+        // Auto Scroll to specific card when redirected from Dashboard Heatmap link
+        window.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const logId = urlParams.get('log_id');
+            if (logId) {
+                const targetCard = document.getElementById('card-box-' + logId);
+                if (targetCard) {
+                    targetCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }
+        });
+    </script>
+</body>
+</html>
